@@ -1,6 +1,6 @@
 {
     "name": "dl-package-info",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "private": true,
     "description": "Package for downloading package information off of Github.",
     "main": "lib/main.js",
@@ -8,7 +8,7 @@
         "build": "tsc",
         "package": "ncc build --source-map --license licenses.txt",
         "test": "jest",
-        "all": "tsc && npm run package && node build.js && jest"
+        "all": "tsc && npm run package && jest"
     },
     "repository": {
         "type": "git",

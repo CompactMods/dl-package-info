@@ -1,6 +1,26 @@
 import { graphql } from "@octokit/graphql";
 import { readFile } from "fs/promises";
 
+const query = `query getPackageInfo($org: String!, $repo: String!, $filter: [String]) {
+    repository(owner: $org, name: $repo) {
+        packages(first: 1, names: $filter) {
+            nodes { 
+                latestVersion { 
+                    files(first: 25) {
+                        nodes { 
+                            name 
+                            size 
+                            updatedAt 
+                            sha256 
+                            url 
+                        }
+                    }
+                }
+            } 
+        }
+    }
+}`;
+
 export interface GHPackage {
     name: string;
     size: bigint;
@@ -11,10 +31,7 @@ export interface GHPackage {
 
 export class GithubPackages {
     public static async getPackageInfo(org: string, repo: string, groups: string[]): Promise<GHPackage[]> {
-        let f = await readFile("query.graphql", "utf-8");
-        f = f.replace("\r\n", "");
-
-        const getPackageInfo = await graphql<any>(f, {
+        const getPackageInfo = await graphql<any>(query, {
             org: org,
             repo: repo,
             group: groups,

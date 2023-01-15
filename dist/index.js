@@ -18,13 +18,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GithubPackages = void 0;
 const graphql_1 = __nccwpck_require__(8467);
-const promises_1 = __nccwpck_require__(9225);
+const query = `query getPackageInfo($org: String!, $repo: String!, $filter: [String]) {
+    repository(owner: $org, name: $repo) {
+        packages(first: 1, names: $filter) {
+            nodes { 
+                latestVersion { 
+                    files(first: 25) {
+                        nodes { 
+                            name 
+                            size 
+                            updatedAt 
+                            sha256 
+                            url 
+                        }
+                    }
+                }
+            } 
+        }
+    }
+}`;
 class GithubPackages {
     static getPackageInfo(org, repo, groups) {
         return __awaiter(this, void 0, void 0, function* () {
-            let f = yield (0, promises_1.readFile)("query.graphql", "utf-8");
-            f = f.replace("\r\n", "");
-            const getPackageInfo = yield (0, graphql_1.graphql)(f, {
+            const getPackageInfo = yield (0, graphql_1.graphql)(query, {
                 org: org,
                 repo: repo,
                 group: groups,
