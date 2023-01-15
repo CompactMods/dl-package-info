@@ -1,0 +1,29 @@
+name: 'Github Packages Information'
+description: 'Download information about Github Packages, such as file metadata and download URLs.'
+author: 'Compact Mods'
+inputs:
+  owner:
+    required: true
+    description: 'The owner of the package.'
+
+  repo:
+    required: true
+    description: 'Repository for the package.'
+
+  group:
+    required: true
+    description: 'Package group name'
+
+  filter:
+    required: false
+    description: 'Regex filter to apply to the resulting file list.'
+
+  outputFile:
+    required: false
+    default: packages.json
+    description: 'File the package information is written to'
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
+
