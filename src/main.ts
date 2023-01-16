@@ -1,4 +1,4 @@
-import { getInput, debug, setFailed } from '@actions/core'
+import { getInput, setOutput, debug, setFailed } from '@actions/core'
 import { GithubPackages } from "./github";
 import { writeFile } from "fs/promises";
 
@@ -18,7 +18,9 @@ async function run() {
             matchFileFilters.push(new RegExp(filter));
         }
 
-        let matchedFiles = await GithubPackages.getPackageInfo(owner, repo, [group]);
+        let pkg = await GithubPackages.getPackageInfo(owner, repo, [group]);
+        let latestVersion = pkg.version;
+        let matchedFiles = pkg.files;
         if (matchFileFilters.length > 0) {
             debug("Pre-filter count: " + matchedFiles.length);
             matchedFiles = matchedFiles.filter(file => {
@@ -33,6 +35,8 @@ async function run() {
         const actualOut = outFile ?? "packages.json";
         debug("Writing output file: " + actualOut)
         await writeFile(actualOut, JSON.stringify(matchedFiles));
+
+        setOutput("version", latestVersion);
     }
 
     catch (err) {

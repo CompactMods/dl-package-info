@@ -23,6 +23,7 @@ const query = `query getPackageInfo($org: String!, $repo: String!, $filter: [Str
         packages(first: 1, names: $filter) {
             nodes { 
                 latestVersion { 
+                    version
                     files(first: 25) {
                         nodes { 
                             name 
@@ -48,8 +49,13 @@ class GithubPackages {
                     authorization: `bearer ${process.env.GQL_TOKEN}`
                 }
             });
-            let pkg = getPackageInfo.repository.packages.nodes[0].latestVersion.files.nodes;
-            return pkg;
+            let latestVersion = getPackageInfo.repository.packages.nodes[0].latestVersion;
+            let version = latestVersion.version;
+            let pkg = latestVersion.files.nodes;
+            return {
+                version: version,
+                files: pkg
+            };
         });
     }
 }
@@ -90,7 +96,9 @@ function run() {
                 (0, core_1.debug)("Adding filter: " + filter);
                 matchFileFilters.push(new RegExp(filter));
             }
-            let matchedFiles = yield github_1.GithubPackages.getPackageInfo(owner, repo, [group]);
+            let pkg = yield github_1.GithubPackages.getPackageInfo(owner, repo, [group]);
+            let latestVersion = pkg.version;
+            let matchedFiles = pkg.files;
             if (matchFileFilters.length > 0) {
                 (0, core_1.debug)("Pre-filter count: " + matchedFiles.length);
                 matchedFiles = matchedFiles.filter(file => {
@@ -104,6 +112,7 @@ function run() {
             const actualOut = outFile !== null && outFile !== void 0 ? outFile : "packages.json";
             (0, core_1.debug)("Writing output file: " + actualOut);
             yield (0, promises_1.writeFile)(actualOut, JSON.stringify(matchedFiles));
+            (0, core_1.setOutput)("version", latestVersion);
         }
         catch (err) {
             if (err instanceof Error)

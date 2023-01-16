@@ -23,6 +23,10 @@ inputs:
     default: packages.json
     description: 'File the package information is written to'
 
+outputs:
+  version:
+    description: Version string of the package
+    
 runs:
   using: 'node16'
   main: 'dist/index.js'

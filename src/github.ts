@@ -6,6 +6,7 @@ const query = `query getPackageInfo($org: String!, $repo: String!, $filter: [Str
         packages(first: 1, names: $filter) {
             nodes { 
                 latestVersion { 
+                    version
                     files(first: 25) {
                         nodes { 
                             name 
@@ -21,6 +22,11 @@ const query = `query getPackageInfo($org: String!, $repo: String!, $filter: [Str
     }
 }`;
 
+export interface GHPackageInfo {
+    version: string;
+    files: GHPackage[];
+}
+
 export interface GHPackage {
     name: string;
     size: bigint;
@@ -30,7 +36,7 @@ export interface GHPackage {
 }
 
 export class GithubPackages {
-    public static async getPackageInfo(org: string, repo: string, groups: string[]): Promise<GHPackage[]> {
+    public static async getPackageInfo(org: string, repo: string, groups: string[]): Promise<GHPackageInfo> {
         const getPackageInfo = await graphql<any>(query, {
             org: org,
             repo: repo,
@@ -40,7 +46,13 @@ export class GithubPackages {
             }
         });
 
-        let pkg = getPackageInfo.repository.packages.nodes[0].latestVersion.files.nodes as GHPackage[];
-        return pkg;
+        let latestVersion = getPackageInfo.repository.packages.nodes[0].latestVersion;
+        let version = latestVersion.version;
+        let pkg = latestVersion.files.nodes as GHPackage[];
+        
+        return { 
+            version: version, 
+            files: pkg 
+        };
     }
 }
