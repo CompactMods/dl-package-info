@@ -1,9 +1,9 @@
 import { graphql } from "@octokit/graphql";
 import { readFile } from "fs/promises";
 
-const query = `query getPackageInfo($org: String!, $repo: String!, $filter: [String]) {
+const query = `query getPackageInfo($org: String!, $repo: String!, $nameFilter: [String]) {
     repository(owner: $org, name: $repo) {
-        packages(first: 1, names: $filter) {
+        packages(first: 1, names: $nameFilter) {
             nodes { 
                 latestVersion { 
                     version
@@ -36,11 +36,11 @@ export interface GHPackage {
 }
 
 export class GithubPackages {
-    public static async getPackageInfo(org: string, repo: string, groups: string[]): Promise<GHPackageInfo> {
+    public static async getPackageInfo(org: string, repo: string, names: string[]): Promise<GHPackageInfo> {
         const getPackageInfo = await graphql<any>(query, {
             org: org,
             repo: repo,
-            group: groups,
+            nameFilter: names,
             headers: {
                 authorization: `bearer ${process.env.GQL_TOKEN}`
             }
