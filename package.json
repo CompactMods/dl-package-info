@@ -1,6 +1,6 @@
 {
     "name": "dl-package-info",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "private": true,
     "description": "Package for downloading package information off of Github.",
     "main": "lib/main.js",
@@ -23,7 +23,7 @@
     },
     "devDependencies": {
         "@types/node": "^18.11.0",
-        "@vercel/ncc": "^0.31.1",
+        "@vercel/ncc": "0.38.0",
         "dotenv": "^16.0.3",
         "jest": "^27.2.5",
         "js-yaml": "^4.1.0",
